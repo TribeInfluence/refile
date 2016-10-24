@@ -114,6 +114,7 @@ module Refile
         data: { reference: options[:data][:reference] }
       }
       hidden_options.merge!(index: options[:index]) if options.key?(:index)
+      hidden_options.merge!(value: options[:value]) if options.key?(:value)
 
       hidden_field(object_name, method, hidden_options)
     end
