@@ -1,6 +1,7 @@
 require "json"
 require "sinatra/base"
 require "tempfile"
+require "uri"
 
 module Refile
   # A Rack application which can be mounted or run on its own.
@@ -171,7 +172,12 @@ module Refile
     def verified?
       base_path = request.fullpath.gsub(::File.join(request.script_name, params[:token]), "")
 
-      Refile.valid_token?(base_path, params[:token]) && not_expired?(params)
+      begin
+        uri = URI.parse(base_path)
+        Refile.valid_token?(uri.path, params[:token]) && not_expired?(params)
+      rescue URI::InvalidURIError => e
+        log_error("Could not parse path '#{base_path}'\n#{e.message}")
+      end
     end
 
     def not_expired?(params)
